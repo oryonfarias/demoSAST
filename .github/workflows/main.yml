@@ -30,7 +30,7 @@ jobs:
             git clone https://github.com/oryonfarias/demoSAST.git
             cd demoSAST
             curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/install.sh | bash
-            horusec start -p"./"
+            horusec start -p"./" -e="true"
   
   deploy-owasp:
     runs-on: ubuntu-latest
