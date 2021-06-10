@@ -1,0 +1,63 @@
+name: demoSAST
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Rodando o Build
+      run: echo Build deu bom !
+      
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+    needs: build
+    steps:
+    - name: Rodande Dev
+      run: echo Dev deu bom !
+    
+  deploy-sast:
+    runs-on: ubuntu-latest
+    environment:
+      name: sast
+    needs: build
+    steps:
+    - name: Rodando o HoruSec
+      run: |
+            sudo apt-get install git -y
+            git clone https://github.com/oryonfarias/demoSAST.git
+            cd demoSAST
+            curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/install.sh | bash
+            horusec start -p"./"
+  
+  deploy-owasp:
+    runs-on: ubuntu-latest
+    environment:
+      name: owasp
+    needs: [deploy-dev, deploy-sast]
+    steps:
+    - name: ZAP scan
+      uses: zaproxy/action-baseline@v0.4.0
+      with:
+        target: 'https://www.zaproxy.org'
+      
+  deploy-hml:
+    runs-on: ubuntu-latest
+    environment:
+      name: hml
+    needs: [deploy-dev, deploy-sast]
+    steps:
+    - name: Rodando HML
+      run: echo Deploy HML deu bom !
+      
+  deploy-prd:
+    runs-on: ubuntu-latest
+    environment:
+      name: prd
+    needs: deploy-hml
+    steps:
+    - name: Rodando PRD
+      run: echo Deploy PRD deu bom !
+   
